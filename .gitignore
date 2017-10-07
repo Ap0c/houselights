@@ -1,3 +1,5 @@
 *.pyc
 *.org
-.env/*
+.env/
+elm-stuff/
+elm.js
