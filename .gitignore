@@ -3,3 +3,5 @@
 .env/
 elm-stuff/
 elm.js
+*.db
+config.py
