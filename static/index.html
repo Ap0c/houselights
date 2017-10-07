@@ -2,6 +2,11 @@
 <html>
     <head></head>
     <body>
-        <script type="text/javascript" src="main.js"></script>
+        <main id="main"></main>
+        <script type="text/javascript" src="static/elm.js"></script>
+        <script>
+            var node = document.getElementById('main');
+            var app = Elm.Main.embed(node);
+        </script>
     </body>
 </html>
