@@ -15,4 +15,5 @@ app.register_blueprint(api, url_prefix='/api')
 @app.route('/')
 def main():
 
-    return 'hello world'
+    return app.send_static_file('index.html')
+
