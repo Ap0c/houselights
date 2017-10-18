@@ -4,6 +4,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Events as Events
+import Html.Attributes as Attrs
 import Http
 import Json.Decode as JsonDecode
 import Json.Encode as JsonEncode
@@ -52,8 +53,34 @@ init =
 
 type Msg
     = NewLights (Result Http.Error ApiResponse)
-    | LightUpdated (Result Http.Error ())
     | LightOn String Bool
+    | LightBri String Int
+    | LightUpdated (Result Http.Error ())
+
+
+updateOn : List HueLight -> String -> Bool -> List HueLight
+updateOn lights id on =
+    List.map
+        (\light ->
+            if light.id == id then
+                { light | on = on }
+            else
+                light
+        )
+        lights
+
+
+updateBri : List HueLight -> String -> Int -> List HueLight
+updateBri lights id bri =
+    List.map
+        (\light ->
+            if light.id == id then
+                { light | bri = bri }
+            else
+                light
+        )
+        lights
+
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -66,7 +93,10 @@ update msg model =
             ( model, Cmd.none )
 
         LightOn id on ->
-            ( model, lightOn id on )
+            ( { model | lights = (updateOn model.lights id on) }, lightOn id on )
+
+        LightBri id bri ->
+            ( { model | lights = (updateBri model.lights id bri) }, lightBri id bri )
 
         LightUpdated _ ->
             ( model, Cmd.none )
@@ -76,12 +106,36 @@ update msg model =
 -- VIEW
 
 
+viewSlider : String -> String -> Int -> (Int -> value) -> Html value
+viewSlider min max value onChange =
+    let
+        toInt =
+            \sliderValue ->
+                case String.toInt sliderValue of
+                    Ok intValue ->
+                        intValue
+
+                    Err _ ->
+                        0
+    in
+        input
+            [ Attrs.type_ "range"
+            , Attrs.min min
+            , Attrs.max max
+            , Attrs.step "1"
+            , Attrs.value (toString value)
+            , Events.on "change" (JsonDecode.map onChange (JsonDecode.map toInt Events.targetValue))
+            ]
+            []
+
+
 viewLight : HueLight -> Html Msg
 viewLight light =
     Html.div []
         [ Html.h2 [] [ Html.text light.name ]
         , Html.button [ Events.onClick (LightOn light.id True) ] [ Html.text "On" ]
         , Html.button [ Events.onClick (LightOn light.id False) ] [ Html.text "Off" ]
+        , viewSlider "0" "255" light.bri (LightBri light.id)
         ]
 
 
@@ -118,6 +172,19 @@ getLights =
         Http.send NewLights (Http.get url decodeLights)
 
 
+updateRequest : String -> Http.Body -> Http.Request ()
+updateRequest url body =
+    Http.request
+        { method = "PATCH"
+        , headers = []
+        , url = url
+        , body = body
+        , expect = Http.expectStringResponse (\_ -> Ok ())
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
 lightOn : String -> Bool -> Cmd Msg
 lightOn id on =
     let
@@ -125,18 +192,25 @@ lightOn id on =
             "/api/lights/hue/" ++ id
 
         body =
-            Http.jsonBody (JsonEncode.object [ ("on", JsonEncode.bool on) ])
+            Http.jsonBody (JsonEncode.object [ ( "on", JsonEncode.bool on ) ])
 
         request =
-            Http.request
-                { method = "PATCH"
-                , headers = []
-                , url = url
-                , body = body
-                , expect = Http.expectStringResponse (\_ -> Ok ())
-                , timeout = Nothing
-                , withCredentials = False
-                }
+            updateRequest url body
+    in
+        Http.send LightUpdated request
+
+
+lightBri : String -> Int -> Cmd Msg
+lightBri id bri =
+    let
+        url =
+            "/api/lights/hue/" ++ id
+
+        body =
+            Http.jsonBody (JsonEncode.object [ ( "bri", JsonEncode.int bri ) ])
+
+        request =
+            updateRequest url body
     in
         Http.send LightUpdated request
 
