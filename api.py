@@ -11,15 +11,15 @@ api = Blueprint('api', __name__)
 
 # ----- Functions ----- #
 
-@api.route('/retrieve', methods=['GET'])
-def retrieve():
+@api.route('/lights', methods=['GET'])
+def get_lights():
 
-    return jsonify({ "lights": hue.scan() })
+    return jsonify({ "data": hue.scan() })
 
-@api.route('/update', methods=['POST'])
-def update():
+@api.route('/lights/hue/<int:hue_id>', methods=['PATCH', 'PUT'])
+def update_light(hue_id):
 
     light = request.get_json()
-    hue.update_state(light)
+    hue.update_light(hue_id, light)
 
-    return jsonify({ "success": True })
+    return 'nice'

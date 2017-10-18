@@ -8,7 +8,6 @@ from config import HUE_BRIDGE_IP
 
 bridge = Bridge(HUE_BRIDGE_IP)
 OPTIONAL_STATE = ['hue', 'sat', 'effect']
-CONSTANT_STATE = ['hue_id', 'name']
 
 
 # ----- Functions ----- #
@@ -30,21 +29,18 @@ def _parse_light(hue_id, raw_light):
     return light
 
 
-def _update_name(light):
-
-    if 'name' in light:
-        bridge.set_light(light['hue_id'], 'name', light['name'])
-
-
 def scan():
 
     lights = bridge.get_light()
     return [_parse_light(id, light) for id, light in lights.items()]
 
 
-def update_state(light):
+def update_light(hue_id, props):
 
-    to_send = {k: v for k, v in light.items() if k not in CONSTANT_STATE}
+    if 'name' in props:
+        bridge.set_light(hue_id, 'name', props['name'])
 
-    bridge.set_light(int(light['hue_id']), to_send)
-    _update_name(light)
+    batch_props = {k: v for k, v in props.items() if k != 'name'}
+
+    bridge.set_light(hue_id, batch_props)
+
