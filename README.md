@@ -1,3 +1,3 @@
 # Houselights
 
-Python/Elm app for controlling Phillips Hue and RF lights.
+Python/Elm app for controlling Philips Hue and RF lights.
