@@ -55,6 +55,7 @@ type Msg
     = NewLights (Result Http.Error ApiResponse)
     | LightOn String Bool
     | LightBri String Int
+    | LightHue String Int
     | LightUpdated (Result Http.Error ())
 
 
@@ -82,6 +83,17 @@ updateBri lights id bri =
         lights
 
 
+updateHue : List HueLight -> String -> Int -> List HueLight
+updateHue lights id hue =
+    List.map
+        (\light ->
+            if light.id == id then
+                { light | hue = Just hue }
+            else
+                light
+        )
+        lights
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -97,6 +109,9 @@ update msg model =
 
         LightBri id bri ->
             ( { model | lights = (updateBri model.lights id bri) }, lightBri id bri )
+
+        LightHue id hue ->
+            ( { model | lights = (updateHue model.lights id hue) }, lightHue id hue )
 
         LightUpdated _ ->
             ( model, Cmd.none )
@@ -129,6 +144,16 @@ viewSlider min max value onChange =
             []
 
 
+maybeSlider : String -> String -> Maybe Int -> (Int -> msg) -> Html msg
+maybeSlider min max value onChange =
+    case value of
+        Just intValue ->
+            viewSlider min max intValue onChange
+
+        Nothing ->
+            Html.text ""
+
+
 viewLight : HueLight -> Html Msg
 viewLight light =
     Html.div []
@@ -136,6 +161,7 @@ viewLight light =
         , Html.button [ Events.onClick (LightOn light.id True) ] [ Html.text "On" ]
         , Html.button [ Events.onClick (LightOn light.id False) ] [ Html.text "Off" ]
         , viewSlider "0" "255" light.bri (LightBri light.id)
+        , maybeSlider "0" "65535" light.hue (LightHue light.id)
         ]
 
 
@@ -208,6 +234,21 @@ lightBri id bri =
 
         body =
             Http.jsonBody (JsonEncode.object [ ( "bri", JsonEncode.int bri ) ])
+
+        request =
+            updateRequest url body
+    in
+        Http.send LightUpdated request
+
+
+lightHue : String -> Int -> Cmd Msg
+lightHue id hue =
+    let
+        url =
+            "/api/lights/hue/" ++ id
+
+        body =
+            Http.jsonBody (JsonEncode.object [ ( "hue", JsonEncode.int hue ) ])
 
         request =
             updateRequest url body
