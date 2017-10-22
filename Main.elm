@@ -56,6 +56,7 @@ type Msg
     | LightOn String Bool
     | LightBri String Int
     | LightHue String Int
+    | LightSat String Int
     | LightUpdated (Result Http.Error ())
 
 
@@ -95,6 +96,18 @@ updateHue lights id hue =
         lights
 
 
+updateSat : List HueLight -> String -> Int -> List HueLight
+updateSat lights id sat =
+    List.map
+        (\light ->
+            if light.id == id then
+                { light | sat = Just sat }
+            else
+                light
+        )
+        lights
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -113,6 +126,9 @@ update msg model =
         LightHue id hue ->
             ( { model | lights = (updateHue model.lights id hue) }, lightHue id hue )
 
+        LightSat id sat ->
+            ( { model | lights = (updateSat model.lights id sat) }, lightSat id sat )
+
         LightUpdated _ ->
             ( model, Cmd.none )
 
@@ -121,8 +137,8 @@ update msg model =
 -- VIEW
 
 
-viewSlider : String -> String -> Int -> (Int -> value) -> Html value
-viewSlider min max value onChange =
+viewSlider : String -> String -> Int -> String -> (Int -> value) -> Html value
+viewSlider min max value label onChange =
     let
         toInt =
             \sliderValue ->
@@ -133,22 +149,25 @@ viewSlider min max value onChange =
                     Err _ ->
                         0
     in
-        input
-            [ Attrs.type_ "range"
-            , Attrs.min min
-            , Attrs.max max
-            , Attrs.step "1"
-            , Attrs.value (toString value)
-            , Events.on "change" (JsonDecode.map onChange (JsonDecode.map toInt Events.targetValue))
+        Html.label []
+            [ Html.text label
+            , Html.input
+                [ Attrs.type_ "range"
+                , Attrs.min min
+                , Attrs.max max
+                , Attrs.step "1"
+                , Attrs.value (toString value)
+                , Events.on "change" (JsonDecode.map onChange (JsonDecode.map toInt Events.targetValue))
+                ]
+                []
             ]
-            []
 
 
-maybeSlider : String -> String -> Maybe Int -> (Int -> msg) -> Html msg
-maybeSlider min max value onChange =
+maybeSlider : String -> String -> Maybe Int -> String -> (Int -> msg) -> Html msg
+maybeSlider min max value label onChange =
     case value of
         Just intValue ->
-            viewSlider min max intValue onChange
+            viewSlider min max intValue label onChange
 
         Nothing ->
             Html.text ""
@@ -160,8 +179,9 @@ viewLight light =
         [ Html.h2 [] [ Html.text light.name ]
         , Html.button [ Events.onClick (LightOn light.id True) ] [ Html.text "On" ]
         , Html.button [ Events.onClick (LightOn light.id False) ] [ Html.text "Off" ]
-        , viewSlider "0" "255" light.bri (LightBri light.id)
-        , maybeSlider "0" "65535" light.hue (LightHue light.id)
+        , viewSlider "0" "255" light.bri "Brightness" (LightBri light.id)
+        , maybeSlider "0" "65535" light.hue "Hue" (LightHue light.id)
+        , maybeSlider "0" "255" light.sat "Saturation" (LightSat light.id)
         ]
 
 
@@ -249,6 +269,21 @@ lightHue id hue =
 
         body =
             Http.jsonBody (JsonEncode.object [ ( "hue", JsonEncode.int hue ) ])
+
+        request =
+            updateRequest url body
+    in
+        Http.send LightUpdated request
+
+
+lightSat : String -> Int -> Cmd Msg
+lightSat id sat =
+    let
+        url =
+            "/api/lights/hue/" ++ id
+
+        body =
+            Http.jsonBody (JsonEncode.object [ ( "sat", JsonEncode.int sat ) ])
 
         request =
             updateRequest url body
