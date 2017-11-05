@@ -1,12 +1,12 @@
 # ----- Imports ----- #
 
 from phue import Bridge
-from config import HUE_BRIDGE_IP
+from config import HUE_BRIDGE_IP, HUE_BRIDGE_USERNAME
 
 
 # ----- Setup ----- #
 
-bridge = Bridge(HUE_BRIDGE_IP)
+bridge = Bridge(ip=HUE_BRIDGE_IP, username=HUE_BRIDGE_USERNAME)
 OPTIONAL_STATE = ['hue', 'sat', 'effect']
 
 
