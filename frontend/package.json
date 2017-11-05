@@ -1,0 +1,19 @@
+{
+  "name": "houselights",
+  "version": "1.0.0",
+  "description": "Python/Elm app for controlling Philips Hue and RF lights.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ap0c/houselights.git"
+  },
+  "author": "Ap0c",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ap0c/houselights/issues"
+  },
+  "homepage": "https://github.com/Ap0c/houselights#readme"
+}
