@@ -4,7 +4,8 @@
   "description": "Python/Elm app for controlling Philips Hue and RF lights.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/Ap0c/houselights/issues"
   },
-  "homepage": "https://github.com/Ap0c/houselights#readme"
+  "homepage": "https://github.com/Ap0c/houselights#readme",
+  "dependencies": {
+    "elm-webpack-loader": "^4.4.0",
+    "html-webpack-plugin": "^2.30.1",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  }
 }
