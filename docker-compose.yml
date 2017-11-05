@@ -1,6 +1,7 @@
 version: '3'
 services:
   backend:
+    restart: on-failure
     build: ./backend
     volumes:
       - ./backend/src:/code
