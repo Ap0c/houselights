@@ -19,6 +19,9 @@ module.exports = {
     ],
     devServer: {
         host: "0.0.0.0",
+        proxy: {
+            "/api": "http://backend:5000",
+        },
     },
     module: {
         rules: [{
