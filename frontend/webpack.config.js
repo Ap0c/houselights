@@ -2,11 +2,22 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 
 // ----- Config ----- //
 
 module.exports = env => {
+
+    const plugins = [
+        new HtmlWebpackPlugin({
+            template: './assets/index.html',
+        }),
+    ];
+
+    if (env && env.prod) {
+        plugins.push(new UglifyJSPlugin());
+    }
 
     return {
 
@@ -17,11 +28,7 @@ module.exports = env => {
             filename: 'app.js',
         },
 
-        plugins: [
-            new HtmlWebpackPlugin({
-                template: './assets/index.html',
-            }),
-        ],
+        plugins,
 
         devServer: {
             host: "0.0.0.0",
