@@ -26,7 +26,7 @@ module.exports = env => {
     return {
 
         entry: {
-            appy: './assets/main.js',
+            app: './assets/main.js',
             styles: './assets/stylesheets/main.scss',
         },
 
