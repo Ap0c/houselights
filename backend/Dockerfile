@@ -1,4 +1,4 @@
-FROM python:alpine
+FROM arm32v6/python:alpine3.7
 
 WORKDIR /code
 
