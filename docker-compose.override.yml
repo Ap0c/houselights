@@ -8,10 +8,8 @@ services:
       - ./backend/src:/code
     environment:
       - FLASK_DEBUG=1
-    command: flask run --host=0.0.0.0
   frontend:
     build:
-      context: ./frontend
       dockerfile: Dockerfile.DEV
     image: houselights_frontend_dev
     volumes:
