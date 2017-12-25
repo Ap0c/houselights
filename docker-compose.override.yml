@@ -25,3 +25,5 @@ services:
       - ./frontend/dist:/usr/share/nginx/html
     ports:
       - "8000:80"
+    networks:
+      - lightsnet
