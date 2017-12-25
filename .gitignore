@@ -8,3 +8,5 @@ elm.js
 *.db
 config.py
 .dir-locals.el
+*.tar
+*.zip
