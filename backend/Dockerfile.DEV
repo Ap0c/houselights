@@ -2,8 +2,6 @@ FROM arm32v7/python:slim-stretch
 
 WORKDIR /code
 
-COPY src .
-COPY requirements.txt .
-
+ADD ./requirements.txt .
 RUN pip install -r requirements.txt
 

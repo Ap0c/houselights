@@ -1,14 +1,25 @@
 version: '3'
 services:
   backend:
+    build:
+      dockerfile: Dockerfile.DEV
+    volumes:
+      - ./backend/src:/code
     environment:
       - FLASK_DEBUG=1
-      - FLASK_APP=main.py
     command: flask run --host=0.0.0.0
   frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.DEV
+    volumes:
+      - ./frontend/assets:/code/assets
+      - ./frontend/dist:/code/dist
     command: npm run devrun
   nginx:
+    image: arm32v7/nginx
     volumes:
-      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html
     ports:
       - "8000:80"
