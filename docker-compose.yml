@@ -11,6 +11,8 @@ services:
     environment:
       - FLASK_APP=main.py
     command: flask run --host=0.0.0.0 --port=5000
+    networks:
+      - houselights_net
   frontend:
     build:
       context: ./frontend
@@ -18,3 +20,7 @@ services:
     image: houselights_frontend_prod
     ports:
       - "80:80"
+    networks:
+      - houselights_net
+networks:
+  houselights_net:
