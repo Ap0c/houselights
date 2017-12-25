@@ -1,4 +1,4 @@
-FROM arm32v7/python:slim-stretch
+FROM arm32v6/python:alpine3.7
 
 WORKDIR /code
 

@@ -5,6 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: houselights_backend_prod
     ports:
       - "5000:5000"
     environment:
@@ -14,5 +15,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: houselights_frontend_prod
     ports:
       - "80:80"

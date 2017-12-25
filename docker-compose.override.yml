@@ -3,6 +3,7 @@ services:
   backend:
     build:
       dockerfile: Dockerfile.DEV
+    image: houselights_backend_dev
     volumes:
       - ./backend/src:/code
     environment:
@@ -12,6 +13,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.DEV
+    image: houselights_frontend_dev
     volumes:
       - ./frontend/assets:/code/assets
       - ./frontend/dist:/code/dist
