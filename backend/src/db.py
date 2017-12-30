@@ -1,57 +1,38 @@
 # ----- Imports ----- #
 
-import sqlite3
+import uuid
+from tinydb import TinyDB, where
 
 
 # ----- Setup ----- #
 
-DB_FILE = 'lights.db'
+DB_FILE = 'lights.json'
 
 
 # ----- Functions ----- #
 
-def _connection():
+def open_db(table_name):
 
-    """Creates and returns a database connection."""
+    """Wrapper, opens a db json file and returns the connection."""
 
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
+    def decorator(func):
 
-    cur = conn.cursor()
+        def wrapper(*args, **kwargs):
 
-    return conn, cur
+            db = TinyDB(DB_FILE)
+            return func(db.table(table_name), *args, **kwargs)
 
+        return wrapper
 
-def _get_cursor(func):
-
-    """Decorator function, passes cursor to function and closes connection."""
-
-    def wrapper(*args, **kwargs):
-
-        conn, cur = _connection()
-
-        result = func(cur, *args, **kwargs)
-
-        conn.commit()
-        conn.close()
-
-        return result
-
-    return wrapper
+    return decorator
 
 
-@_get_cursor
-def setup_db(cur):
+@open_db('groups')
+def add_group(db, name, lights):
 
-    """Sets up the tables needed."""
+    """Adds a light to the database."""
 
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS lights
-            ( id INTEGER PRIMARY KEY
-            , name TEXT
-            , hueId INTEGER
-            , rfOn INTEGER
-            , rfOff INTEGER
-            )
-    ''')
+    record = {'id': str(uuid.uuid4()), 'name': name, 'lights': lights}
+    db.insert(record)
 
+    return record['id']

@@ -10,3 +10,4 @@ config.py
 .dir-locals.el
 *.tar
 *.zip
+lights.json
