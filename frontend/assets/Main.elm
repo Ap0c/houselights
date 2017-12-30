@@ -229,7 +229,6 @@ viewLight light =
         , viewSlider "0" "255" light.bri "Brightness" (LightBri light.id)
         , maybeSlider "0" "65535" light.hue "Hue" (LightHue light.id)
         , maybeSlider "0" "255" light.sat "Saturation" (LightSat light.id)
-        , Html.a [ Attrs.href "/#groups" ] [ Html.text "Groups" ]
         ]
 
 
