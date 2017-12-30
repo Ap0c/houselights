@@ -1,0 +1,27 @@
+/* Nav Styles */
+
+.nav {
+    background-color: #fff;
+    font-family: system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px 0;
+}
+
+.nav__inner {
+    text-align: center;
+    @include mq($from: wide) {
+        width: 1300px;
+        margin: 0 auto;
+    }
+}
+
+.nav__link {
+    text-decoration: none;
+    color: #333;
+    padding: 0 10px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

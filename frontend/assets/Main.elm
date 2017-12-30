@@ -240,20 +240,37 @@ viewNotFound =
         ]
 
 
+viewNav : Html Msg
+viewNav =
+    Html.nav [ Attrs.class "nav" ]
+        [ Html.div [ Attrs.class "nav__inner" ]
+            [ Html.a [ Attrs.class "nav__link", Attrs.href "#lights" ] [ text "Lights" ]
+            , Html.a [ Attrs.class "nav__link", Attrs.href "#groups" ] [ text "Groups" ]
+            ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
-    case model.route of
-        LightsRoute ->
-            Html.div [ Attrs.class "light-cards" ]
-                (List.map viewLight model.lights)
+    let
+        content =
+            case model.route of
+                LightsRoute ->
+                    Html.div [ Attrs.class "light-cards" ]
+                        (List.map viewLight model.lights)
 
-        GroupsRoute ->
-            Html.div []
-                [ text "Some groups"
-                ]
+                GroupsRoute ->
+                    Html.div []
+                        [ text "Some groups"
+                        ]
 
-        NotFoundRoute ->
-            viewNotFound
+                NotFoundRoute ->
+                    viewNotFound
+    in
+        Html.div []
+            [ viewNav
+            , content
+            ]
 
 
 
