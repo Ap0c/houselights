@@ -33,7 +33,6 @@ module.exports = env => {
         output: {
             path: path.resolve(__dirname, 'dist'),
             filename: '[name].js',
-            publicPath: '/',
         },
 
         plugins,
@@ -43,7 +42,6 @@ module.exports = env => {
             proxy: {
                 "/api": "http://backend:5000",
             },
-            historyApiFallback: true,
         },
 
         module: {

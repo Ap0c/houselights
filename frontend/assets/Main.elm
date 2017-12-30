@@ -229,7 +229,7 @@ viewLight light =
         , viewSlider "0" "255" light.bri "Brightness" (LightBri light.id)
         , maybeSlider "0" "65535" light.hue "Hue" (LightHue light.id)
         , maybeSlider "0" "255" light.sat "Saturation" (LightSat light.id)
-        , Html.a [ Attrs.href "/groups" ] [ Html.text "Groups" ]
+        , Html.a [ Attrs.href "/#groups" ] [ Html.text "Groups" ]
         ]
 
 
@@ -246,10 +246,12 @@ view model =
         LightsRoute ->
             Html.div [ Attrs.class "light-cards" ]
                 (List.map viewLight model.lights)
+
         GroupsRoute ->
             Html.div []
                 [ text "Some groups"
                 ]
+
         NotFoundRoute ->
             viewNotFound
 
