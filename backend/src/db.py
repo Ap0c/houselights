@@ -30,15 +30,28 @@ def _open_db(table_name):
 @_open_db('groups')
 def get_groups(db):
 
+    """Returns all groups in the database."""
+
     return db.all()
 
 
 @_open_db('groups')
 def add_group(db, name, lights):
 
-    """Adds a light to the database."""
+    """Adds a group to the database."""
 
     record = {'id': str(uuid.uuid4()), 'name': name, 'lights': lights}
     db.insert(record)
 
     return record['id']
+
+
+@_open_db('groups')
+def get_group(db, group_id):
+
+    """Retrieves a specific group from the database."""
+
+    try:
+        return db.search(where('id') == group_id)[0]
+    except IndexError:
+        return None
