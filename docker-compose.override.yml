@@ -15,6 +15,7 @@ services:
     volumes:
       - ./frontend/assets:/code/assets
       - ./frontend/dist:/code/dist
+      - ./frontend/webpack.config.js:/code/webpack.config.js
     command: npm run devrun
   nginx:
     image: arm32v7/nginx
