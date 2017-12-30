@@ -40,3 +40,16 @@ def new_group():
     db.add_group(group['name'], group['lights'])
 
     return '', 204
+
+
+@api.route('/groups/<string:group_id>', methods=['PATCH', 'PUT'])
+def update_group(group_id):
+
+    group = db.get_group(group_id)
+    props = request.get_json()
+
+    if group:
+        hue.update_lights(group['lights'], props)
+        return '', 204
+    else:
+        return '', 404
