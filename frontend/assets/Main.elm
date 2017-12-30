@@ -180,10 +180,10 @@ viewSlider min max value label onChange =
                     Err _ ->
                         0
     in
-        Html.label [ Attrs.class "light-card__slider" ]
+        Html.label [ Attrs.class "content-card__slider" ]
             [ Html.text label
             , Html.input
-                [ Attrs.class "light-card__range"
+                [ Attrs.class "content-card__range"
                 , Attrs.type_ "range"
                 , Attrs.min min
                 , Attrs.max max
@@ -207,14 +207,14 @@ maybeSlider min max value label onChange =
 
 viewOnOff : String -> Html Msg
 viewOnOff lightId =
-    Html.div [ Attrs.class "light-card__on-off" ]
+    Html.div [ Attrs.class "content-card__on-off" ]
         [ Html.button
-            [ Attrs.class "light-card__on-off-button"
+            [ Attrs.class "content-card__on-off-button"
             , Events.onClick (LightOn lightId True)
             ]
             [ Html.text "On" ]
         , Html.button
-            [ Attrs.class "light-card__on-off-button"
+            [ Attrs.class "content-card__on-off-button"
             , Events.onClick (LightOn lightId False)
             ]
             [ Html.text "Off" ]
@@ -223,8 +223,8 @@ viewOnOff lightId =
 
 viewLight : HueLight -> Html Msg
 viewLight light =
-    Html.div [ Attrs.class "light-card" ]
-        [ Html.h2 [ Attrs.class "light-card__title" ] [ Html.text light.name ]
+    Html.div [ Attrs.class "content-card" ]
+        [ Html.h2 [ Attrs.class "content-card__title" ] [ Html.text light.name ]
         , viewOnOff light.id
         , viewSlider "0" "255" light.bri "Brightness" (LightBri light.id)
         , maybeSlider "0" "65535" light.hue "Hue" (LightHue light.id)
@@ -234,8 +234,9 @@ viewLight light =
 
 viewGroup : LightGroup -> Html Msg
 viewGroup group =
-    Html.div [] [ text group.name ]
-
+    Html.div [ Attrs.class "content-card" ]
+        [ Html.h2 [ Attrs.class "content-card__title" ] [ Html.text group.name ]
+        ]
 
 viewNotFound : Html Msg
 viewNotFound =
@@ -260,11 +261,11 @@ view model =
         content =
             case model.route of
                 LightsRoute ->
-                    Html.div [ Attrs.class "light-cards" ]
+                    Html.div [ Attrs.class "content-cards" ]
                         (List.map viewLight model.lights)
 
                 GroupsRoute ->
-                    Html.div []
+                    Html.div [ Attrs.class "content-cards" ]
                         (List.map viewGroup model.groups)
 
                 NotFoundRoute ->

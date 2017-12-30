@@ -1,4 +1,136 @@
 @import 'breakpoints.scss';
-@import 'nav.scss';
-@import 'lights.scss';
+
+/* General/Browser Resets */
+
+html, body {
+    padding: 0;
+    margin: 0;
+    background-color: #333;
+    color: #333;
+}
+
+/* Nav */
+
+.nav {
+    background-color: #fff;
+    font-family: system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px 0;
+}
+
+.nav__inner {
+    text-align: center;
+    @include mq($from: wide) {
+        width: 1300px;
+        margin: 0 auto;
+    }
+}
+
+.nav__link {
+    text-decoration: none;
+    color: #333;
+    padding: 0 10px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+/* Content Cards */
+
+.content-cards {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: space-between;
+
+    @include mq($from: wide) {
+        width: 1300px;
+        margin: 0 auto;
+    }
+}
+
+.content-card {
+    flex: 1 0 90%;
+    border-radius: 20px;
+    background-color: #fff;
+    margin: 10px;
+    padding: 30px;
+    box-sizing: border-box;
+
+    @include mq($from: phablet) {
+        flex-basis: 40%;
+    }
+
+    @include mq($from: desktop) {
+        flex-basis: 26%;
+    }
+}
+
+.content-card__title {
+    flex: 1 0 100%;
+    margin: 0 0 20px;
+    font-family: system-ui, sans-serif;
+    font-weight: bold;
+}
+
+.content-card__on-off {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.content-card__on-off-button {
+    width: 50%;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 10px;
+    flex: 0 0 48%;
+}
+
+.content-card__slider {
+    font-family: system-ui, sans-serif;
+    font-weight: bold;
+}
+
+.content-card__range {
+    display: block;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 10px 0;
+    cursor: pointer;
+
+    &::-webkit-slider-runnable-track {
+        background-color: #333;
+    }
+
+    &::-moz-range-track {
+        background-color: #333;
+    }
+
+    &::-ms-track {
+        background-color: #333;
+    }
+
+    &::-moz-range-thumb {
+        background-color: #fff;
+        border: 1px solid #333;
+    }
+
+    &::-webkit-slider-thumb {
+        background-color: #fff;
+        border: 1px solid #333;
+    }
+
+    &::-ms-thumb {
+        background-color: #fff;
+        border: 1px solid #333;
+    }
+}
 
