@@ -149,10 +149,11 @@ viewSlider min max value label onChange =
                     Err _ ->
                         0
     in
-        Html.label []
+        Html.label [ Attrs.class "light-card__slider" ]
             [ Html.text label
             , Html.input
-                [ Attrs.type_ "range"
+                [ Attrs.class "light-card__range"
+                , Attrs.type_ "range"
                 , Attrs.min min
                 , Attrs.max max
                 , Attrs.step "1"
@@ -173,12 +174,27 @@ maybeSlider min max value label onChange =
             Html.text ""
 
 
+viewOnOff : String -> Html Msg
+viewOnOff lightId =
+    Html.div [ Attrs.class "light-card__on-off" ]
+        [ Html.button
+            [ Attrs.class "light-card__on-off-button"
+            , Events.onClick (LightOn lightId True)
+            ]
+            [ Html.text "On" ]
+        , Html.button
+            [ Attrs.class "light-card__on-off-button"
+            , Events.onClick (LightOn lightId False)
+            ]
+            [ Html.text "Off" ]
+        ]
+
+
 viewLight : HueLight -> Html Msg
 viewLight light =
-    Html.div []
-        [ Html.h2 [] [ Html.text light.name ]
-        , Html.button [ Events.onClick (LightOn light.id True) ] [ Html.text "On" ]
-        , Html.button [ Events.onClick (LightOn light.id False) ] [ Html.text "Off" ]
+    Html.div [ Attrs.class "light-card" ]
+        [ Html.h2 [ Attrs.class "light-card__title" ] [ Html.text light.name ]
+        , viewOnOff light.id
         , viewSlider "0" "255" light.bri "Brightness" (LightBri light.id)
         , maybeSlider "0" "65535" light.hue "Hue" (LightHue light.id)
         , maybeSlider "0" "255" light.sat "Saturation" (LightSat light.id)
@@ -187,7 +203,7 @@ viewLight light =
 
 view : Model -> Html Msg
 view model =
-    Html.div []
+    Html.div [ Attrs.class "light-cards" ]
         (List.map viewLight model.lights)
 
 
