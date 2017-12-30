@@ -9,11 +9,13 @@ import Http
 import Json.Decode as JsonDecode
 import Json.Encode as JsonEncode
 import Json.Decode.Pipeline as JsonPipeline
+import Navigation exposing (Location)
+import UrlParser exposing (..)
 
 
 main : Program Never Model Msg
 main =
-    Html.program
+    Navigation.program OnLocationChange
         { init = init
         , view = view
         , update = update
@@ -26,7 +28,10 @@ main =
 
 
 type alias Model =
-    { lights : List HueLight }
+    { lights : List HueLight
+    , groups : List LightGroup
+    , route : Route
+    }
 
 
 type alias HueLight =
@@ -40,11 +45,22 @@ type alias HueLight =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( Model []
-    , getLights
-    )
+type alias LightGroup =
+    { id : String
+    , name : String
+    , lights : List String
+    }
+
+
+init : Location -> ( Model, Cmd Msg )
+init location =
+    let
+        currentRoute =
+            parseLocation location
+    in
+        ( Model [] [] currentRoute
+        , getLights
+        )
 
 
 
@@ -52,7 +68,9 @@ init =
 
 
 type Msg
-    = NewLights (Result Http.Error ApiResponse)
+    = OnLocationChange Location
+    | NewLights (Result Http.Error LightsResponse)
+    | NewGroups (Result Http.Error GroupsResponse)
     | LightOn String Bool
     | LightBri String Int
     | LightHue String Int
@@ -111,10 +129,23 @@ updateSat lights id sat =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        OnLocationChange location ->
+            let
+                newRoute =
+                    parseLocation location
+            in
+                ( { model | route = newRoute }, Cmd.none )
+
         NewLights (Ok response) ->
-            ( Model response.data, Cmd.none )
+            ( { model | lights = response.data }, Cmd.none )
 
         NewLights (Err _) ->
+            ( model, Cmd.none )
+
+        NewGroups (Ok response) ->
+            ( { model | groups = response.data }, Cmd.none )
+
+        NewGroups (Err _) ->
             ( model, Cmd.none )
 
         LightOn id on ->
@@ -198,13 +229,29 @@ viewLight light =
         , viewSlider "0" "255" light.bri "Brightness" (LightBri light.id)
         , maybeSlider "0" "65535" light.hue "Hue" (LightHue light.id)
         , maybeSlider "0" "255" light.sat "Saturation" (LightSat light.id)
+        , Html.a [ Attrs.href "/groups" ] [ Html.text "Groups" ]
+        ]
+
+
+viewNotFound : Html Msg
+viewNotFound =
+    Html.div []
+        [ text "Not Found"
         ]
 
 
 view : Model -> Html Msg
 view model =
-    Html.div [ Attrs.class "light-cards" ]
-        (List.map viewLight model.lights)
+    case model.route of
+        LightsRoute ->
+            Html.div [ Attrs.class "light-cards" ]
+                (List.map viewLight model.lights)
+        GroupsRoute ->
+            Html.div []
+                [ text "Some groups"
+                ]
+        NotFoundRoute ->
+            viewNotFound
 
 
 
@@ -220,8 +267,13 @@ subscriptions model =
 -- HTTP
 
 
-type alias ApiResponse =
+type alias LightsResponse =
     { data : List HueLight
+    }
+
+
+type alias GroupsResponse =
+    { data : List LightGroup
     }
 
 
@@ -230,6 +282,15 @@ getLights =
     let
         url =
             "/api/lights"
+    in
+        Http.send NewLights (Http.get url decodeLights)
+
+
+getGroups : Cmd Msg
+getGroups =
+    let
+        url =
+            "/api/groups"
     in
         Http.send NewLights (Http.get url decodeLights)
 
@@ -307,9 +368,9 @@ lightSat id sat =
         Http.send LightUpdated request
 
 
-decodeLights : JsonDecode.Decoder ApiResponse
+decodeLights : JsonDecode.Decoder LightsResponse
 decodeLights =
-    JsonPipeline.decode ApiResponse
+    JsonPipeline.decode LightsResponse
         |> JsonPipeline.required "data" (JsonDecode.list decodeLight)
 
 
@@ -323,3 +384,32 @@ decodeLight =
         |> JsonPipeline.optional "hue" (JsonDecode.map Just JsonDecode.int) Nothing
         |> JsonPipeline.optional "sat" (JsonDecode.map Just JsonDecode.int) Nothing
         |> JsonPipeline.optional "effect" (JsonDecode.map Just JsonDecode.string) Nothing
+
+
+
+-- ROUTING
+
+
+type Route
+    = LightsRoute
+    | GroupsRoute
+    | NotFoundRoute
+
+
+matchers : Parser (Route -> a) a
+matchers =
+    oneOf
+        [ UrlParser.map LightsRoute top
+        , UrlParser.map LightsRoute (UrlParser.s "lights")
+        , UrlParser.map GroupsRoute (UrlParser.s "groups")
+        ]
+
+
+parseLocation : Location -> Route
+parseLocation location =
+    case (parseHash matchers location) of
+        Just route ->
+            route
+
+        Nothing ->
+            NotFoundRoute
