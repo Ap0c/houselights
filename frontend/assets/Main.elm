@@ -59,7 +59,7 @@ init location =
             parseLocation location
     in
         ( Model [] [] currentRoute
-        , getLights
+        , Cmd.batch [ getLights, getGroups ]
         )
 
 
@@ -232,6 +232,11 @@ viewLight light =
         ]
 
 
+viewGroup : LightGroup -> Html Msg
+viewGroup group =
+    Html.div [] [ text group.name ]
+
+
 viewNotFound : Html Msg
 viewNotFound =
     Html.div []
@@ -260,8 +265,7 @@ view model =
 
                 GroupsRoute ->
                     Html.div []
-                        [ text "Some groups"
-                        ]
+                        (List.map viewGroup model.groups)
 
                 NotFoundRoute ->
                     viewNotFound
@@ -310,7 +314,7 @@ getGroups =
         url =
             "/api/groups"
     in
-        Http.send NewLights (Http.get url decodeLights)
+        Http.send NewGroups (Http.get url decodeGroups)
 
 
 updateRequest : String -> Http.Body -> Http.Request ()
@@ -402,6 +406,20 @@ decodeLight =
         |> JsonPipeline.optional "hue" (JsonDecode.map Just JsonDecode.int) Nothing
         |> JsonPipeline.optional "sat" (JsonDecode.map Just JsonDecode.int) Nothing
         |> JsonPipeline.optional "effect" (JsonDecode.map Just JsonDecode.string) Nothing
+
+
+decodeGroups : JsonDecode.Decoder GroupsResponse
+decodeGroups =
+    JsonPipeline.decode GroupsResponse
+        |> JsonPipeline.required "data" (JsonDecode.list decodeGroup)
+
+
+decodeGroup : JsonDecode.Decoder LightGroup
+decodeGroup =
+    JsonPipeline.decode LightGroup
+        |> JsonPipeline.required "id" JsonDecode.string
+        |> JsonPipeline.required "name" JsonDecode.string
+        |> JsonPipeline.required "lights" (JsonDecode.list JsonDecode.string)
 
 
 
