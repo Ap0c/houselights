@@ -1,7 +1,6 @@
 // ----- Imports ----- //
 
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -13,9 +12,6 @@ module.exports = env => {
     const isProd = env && env.prod;
 
     const plugins = [
-        new HtmlWebpackPlugin({
-            template: './assets/index.html',
-        }),
         new ExtractTextPlugin('styles.css'),
     ];
 
@@ -42,6 +38,7 @@ module.exports = env => {
             proxy: {
                 "/api": "http://backend:5000",
             },
+            index: './assets/index.html',
         },
 
         module: {
