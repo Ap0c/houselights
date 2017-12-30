@@ -18,6 +18,12 @@ def get_lights():
     return jsonify({ "data": hue.scan() })
 
 
+@api.route('/groups', methods=['GET'])
+def get_groups():
+
+    return jsonify({ "data": db.get_groups() })
+
+
 @api.route('/lights/hue/<int:hue_id>', methods=['PATCH', 'PUT'])
 def update_light(hue_id):
 

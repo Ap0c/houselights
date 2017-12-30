@@ -11,7 +11,7 @@ DB_FILE = 'lights.json'
 
 # ----- Functions ----- #
 
-def open_db(table_name):
+def _open_db(table_name):
 
     """Wrapper, opens a db json file and returns the connection."""
 
@@ -27,7 +27,13 @@ def open_db(table_name):
     return decorator
 
 
-@open_db('groups')
+@_open_db('groups')
+def get_groups(db):
+
+    return db.all()
+
+
+@_open_db('groups')
 def add_group(db, name, lights):
 
     """Adds a light to the database."""
