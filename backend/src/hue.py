@@ -42,5 +42,6 @@ def update_light(hue_id, props):
 
     batch_props = {k: v for k, v in props.items() if k != 'name'}
 
-    bridge.set_light(hue_id, batch_props)
+    if batch_props:
+        bridge.set_light(hue_id, batch_props)
 
